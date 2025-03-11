@@ -1,229 +1,354 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cwuik</title>
+    <title>Game Website</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: black;
+            background-color: #121212;
             color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease;
+        }
+        header {
+            background-color: #1a1a1a;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+        .header-left img {
+            width: 50px; /* Set the image size */
+            height: auto;
         }
         .search-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 10px;
+            width: 100%;
         }
-        .search-input {
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            background: #333;
+        .search-container input {
+            padding: 8px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #333;
             color: white;
-            width: 200px;
+            width: 50%;
+            max-width: 400px;
         }
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2px;
-            justify-content: center;
-        }
-        .game-card {
-            position: relative;
-            width: 220px;
-            height: 130px;
-            border-radius: 15px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0px 0px 15px green;
+        .switch-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 20px;
+            background-color: #1a1a1a;
         }
-        .game-card:active {
-            transform: scale(0.95);
-            transition: transform 0.1s ease;
+        .switch-container button, .switch-container select {
+            padding: 10px;
+            cursor: pointer;
+            margin: 5px;
+            background-color: #333;
+            border: none;
+            color: white;
+            border-radius: 5px;
         }
-        @keyframes slowRgbGlow {
-            0% { box-shadow: 0px 0px 15px red; }
-            20% { box-shadow: 0px 0px 15px orange; }
-            40% { box-shadow: 0px 0px 15px yellow; }
-            60% { box-shadow: 0px 0px 15px green; }
-            80% { box-shadow: 0px 0px 15px blue; }
-            100% { box-shadow: 0px 0px 15px violet; }
+        .switch-container select {
+            font-size: 16px;
         }
-        .game-card:hover {
-            transform: scale(1.1);
-            animation: slowRgbGlow 3s infinite alternate;
+        .switch-container button:hover, .switch-container select:hover {
+            background-color: #444;
         }
-        .game-card img {
+        .games-played {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            margin-left: 20px;
+        }
+        .games-played img {
+            width: 60px;
+            height: 60px;
+            border-radius: 5px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .main-page {
+            margin-top: 100px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+        }
+        .game-thumbnail {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            border-radius: 8px;
+            background-color: #333;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .game-thumbnail img {
             width: 100%;
             height: 100%;
-            border-radius: 15px;
             object-fit: cover;
         }
-        .game-title {
-            font-size: 14px;
-            margin-top: 5px;
-            position: absolute;
-            bottom: 5px;
-            background: rgba(0, 0, 0, 0.5);
-            width: 100%;
-            text-align: center;
-            padding: 3px 0;
+        .game-thumbnail:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px 5px var(--glow-color, #00f);
         }
-        .fullscreen-container {
+        .fullscreen-game {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 20;
+            flex-direction: column;
         }
-        .fullscreen-container.show {
-            opacity: 1;
+        .fullscreen-header {
             display: flex;
-        }
-        .fullscreen-container iframe {
+            justify-content: space-between;
             width: 100%;
-            height: 100%;
-            border: none;
+            background-color: black;
+            color: white;
+            padding: 5px 15px;
+            position: absolute;
+            top: 0;
+            height: 50px;
+            align-items: center;
         }
-        .back-button {
+        .fullscreen-header img {
+            height: 30px;
+            transition: transform 0.3s ease;
+        }
+        .fullscreen-header img:hover {
+            transform: scale(1.2);
+        }
+        .fullscreen-header .back-btn {
+            cursor: pointer;
+        }
+        .fullscreen-header .fullscreen-btn {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .game-thumbnail.active {
+            box-shadow: 0 0 20px 5px var(--glow-color, #00f);
+        }
+
+        /* Added styles for the GitHub section */
+        .footer-info {
             position: absolute;
             top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            left: 20px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
         }
-        .back-button:hover {
-            transform: scale(1.2);
-            box-shadow: 0px 0px 15px white;
+        .footer-info button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .footer-info button:hover {
+            background-color: #444;
         }
     </style>
 </head>
-<body contenteditable="false">
-    <div class="search-container">
-        <input type="text" class="search-input" id="search" placeholder="Search games..." onkeyup="filterGames()">
-    </div>
-    <div class="games-grid" id="gamesGrid"><div class="game-card" data-name="drive mad 2"><img src="https://static.playhop.com/images/2082b_1890793_91a46/edc0cfaed/2a0000018e2b12d1_29ac852/28908d20e5fcfe92febf_63f058/orig"><div class="game-title">Drive Mad 2</div></div><div class="game-card" data-name="geometry dash"><img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/322170/capsule_616x353.jpg"><div class="game-title">Geometry Dash</div></div><div class="game-card" data-name="sketch book"><img src="https://canada1.discourse-cdn.com/flex035/uploads/threejs/original/2X/0/051ece83d5266f62ca4f9a80ce35578dfd60be5c.jpeg"><div class="game-title">Sketch Book</div></div><div class="game-card" data-name="paper io 2"><img src="https://i.ytimg.com/vi/tjnyIiCkp9Q/maxresdefault.jpg"><div class="game-title">Paper Io 2</div></div><div class="game-card" data-name="dadish"><img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_Dadish_image1600w.jpg"><div class="game-title">Dadish</div></div><div class="game-card" data-name="elastic man"><img src="https://d21u3ic0kp9e91.cloudfront.net/meta/elastic-man.jpg"><div class="game-title">Elastic Man</div></div><div class="game-card" data-name="crossy road"><img src="https://images.squarespace-cdn.com/content/v1/5cedd5e7c6e7df0001bbb67c/1564551973622-EE9YJORD9OFXPKW9NYKW/Banner_Video_Cover.jpg?format=1500w"><div class="game-title">Crossy Road</div></div><div class="game-card" data-name="doge miner"><img src="https://imgs.crazygames.com/games/doge-miner/cover-1593443166599.png?metadata=none&amp;quality=40&amp;width=1200&amp;height=630&amp;fit=crop"><div class="game-title">Doge Miner</div></div><div class="game-card" data-name="1v1.lol"><img src="https://imgs.crazygames.com/games/1v1-lol/cover-1585728351086.png?metadata=none&amp;quality=40&amp;width=1200&amp;height=630&amp;fit=crop"><div class="game-title">1v1.lol</div></div><div class="game-card" data-name="dadish 3d"><img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/2x1_NSwitchDS_Dadish3D_image1600w.jpg"><div class="game-title">Dadish 3D</div></div><div class="game-card" data-name="stickman climb 2"><img src="https://www.fnfgo.com/wp-content/uploads/2024/08/Stickman-Climb-2.jpg"><div class="game-title">Stickman Climb 2</div></div><div class="game-card" data-name="cats"><img src="https://catsthegame.gamepix.com/assets/cats-bg.png"><div class="game-title">CATS</div></div><div class="game-card" data-name="duck life"><img src="https://i.postimg.cc/xT8FyjQg/Screenshot-2025-02-08-182207.png"><div class="game-title">Duck Life</div></div><div class="game-card" data-name="duck life 2"><img src="https://www.coolmathgames.com/sites/default/files/DuckLife2_OG-logo.jpg"><div class="game-title">Duck Life 2</div></div><div class="game-card" data-name="duck life 3 evolution"><img src="https://www.coolmathgames.com/sites/default/files/DuckLife3_OG-logo.jpg"><div class="game-title">Duck Life 3 Evolution</div></div><div class="game-card" data-name="duck life 4"><img src="https://monkeymart.org/wp-content/uploads/2023/09/duck-life-4-banner.jpeg"><div class="game-title">Duck Life 4</div></div><div class="game-card" data-name="dyna boy"><img src="https://i.postimg.cc/K8n7tC1J/Screenshot-2025-02-08-183204.png"><div class="game-title">Dyna Boy</div></div><div class="game-card" data-name="stickman parkour 3"><img src="https://img.gamepix.com/games/stickman-parkour-3/cover/stickman-parkour-3.png?w=400&amp;ar=16:10"><div class="game-title">Stickman Parkour 3</div></div><div class="game-card" data-name="dadish 3"><img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/2x1_NSwitchDS_Dadish3_image1600w.jpg"><div class="game-title">Dadish 3</div></div><div class="game-card" data-name="ovo 2"><img src="https://lh3.googleusercontent.com/FOaLiWCIhdC5K-oE5UofoDpn3w2ZEAq359yAembr-Q-7mRqNd9ramV97FqyqPuqohwDdQZOm5MF9DL-QcTliLNmf=s1280-w1280-h800"><div class="game-title">OvO 2</div></div><div class="game-card" data-name="subway surfers new york"><img src="https://i.ytimg.com/vi/4EDZ7wwY1gE/maxresdefault.jpg"><div class="game-title">Subway Surfers New York</div></div><div class="game-card" data-name="dadish 2"><img src="https://www.nintendo.com/eu/media/images/10_share_images/games_15/nintendo_switch_download_software_1/H2x1_NSwitchDS_Dadish2.jpg"><div class="game-title">Dadish 2</div></div><div class="game-card" data-name="super mario bros."><img src="https://townsquare.media/site/295/files/2020/09/super-mario-bros.jpg?w=780&amp;q=75"><div class="game-title">Super Mario Bros.</div></div><div class="game-card" data-name="time shooter 3 s.w.a.t"><img src="https://images.crazygames.com/time-shooter-3-swat_16x9/20241113103402/time-shooter-3-swat_16x9-cover?auto=format,compress&amp;q=75&amp;cs=strip"><div class="game-title">Time Shooter 3 S.W.A.T</div></div><div class="game-card" data-name="stickman archero fight"><img src="https://images.crazygames.com/stickman-archero-fight/20221115174354/stickman-archero-fight-cover?auto=format,compress&amp;q=75&amp;cs=strip"><div class="game-title">Stickman Archero Fight</div></div><div class="game-card" data-name="tiny fishing"><img src="https://cdn.content.play123.com/game-images/tiny-fishing_xl.jpg"><div class="game-title">Tiny Fishing</div></div><div class="game-card" data-name="bitlife"><img src="https://www.escapistmagazine.com/wp-content/uploads/2024/04/BitLife-Baby-Logo.jpg?resize=1200%2C675"><div class="game-title">Bitlife</div></div><div class="game-card" data-name="superbrawl"><img src="https://gamemedia.armorgames.com/18577/icn_heroimage.png"><div class="game-title">Superbrawl</div></div><div class="game-card" data-name="slope"><img src="https://sloperun.org/data/image/posts/slope-image.jpg"><div class="game-title">Slope</div></div><div class="game-card" data-name="paint strike"><img src="https://images.crazygames.com/paint-strike/20221026085152/paint-strike-cover?auto=format,compress&amp;q=75&amp;cs=strip"><div class="game-title">Paint Strike</div></div><div class="game-card" data-name="idle ants"><img src="https://modzmania.com/wp-content/uploads/2024/03/Idle-Ants-Mod-menu.webp"><div class="game-title">Idle Ants</div></div><div class="game-card" data-name="cookie clicker"><img src="https://i.postimg.cc/zfYb5kFM/Screenshot-2025-02-08-191941.png"><div class="game-title">Cookie Clicker</div></div><div class="game-card" data-name="run 3 editor"><img src="https://ubg365.github.io/run-3-editor/loading.png"><div class="game-title">Run 3 Editor</div></div><div class="game-card" data-name="run 3"><img src="https://www.coolmathgames.com/sites/default/files/Run3_OG-logo.jpg"><div class="game-title">Run 3</div></div><div class="game-card" data-name="monster tracks"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYqofF0YGyQlZFIL9pKhac_XBz98DVtqs0CTQqVJ6yqHmIlSNVzvTTh0p6vp6dokXZ1qY&amp;usqp=CAU"><div class="game-title">Monster Tracks</div></div><div class="game-card" data-name="jelly truck"><img src="https://www.coolmathgames.com/sites/default/files/JellyTruck_OG-Logo.jpg"><div class="game-title">Jelly Truck</div></div><div class="game-card" data-name="burnout drift: seaport max"><img src="https://i.ytimg.com/vi/bainIBr7Cyg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&amp;rs=AOn4CLCc6frQ4_dvThFt6X7eUnPkmY6sxA"><div class="game-title">Burnout Drift: Seaport Max</div></div><div class="game-card" data-name="highway traffic"><img src="https://static.playhop.com/images/a60f5_1892995_cd5c1/ad8df4e4b/2a0000017d76ada9_9a4c0a9/66b138c19b30dc97e12b_62b6fb/default526x314"><div class="game-title">Highway Traffic</div></div><div class="game-card" data-name="eggy car"><img src="https://images.crazygames.com/eggy-car/20230720050147/eggy-car-cover?auto=format,compress&amp;q=75&amp;cs=strip"><div class="game-title">Eggy Car</div></div><div class="game-card" data-name="rocket soccer derby"><img src="https://m.media-amazon.com/images/I/B1P+CzRoNJL.png"><div class="game-title">Rocket Soccer Derby</div></div><div class="game-card" data-name="scrap metal 3"><img src="https://i.ytimg.com/vi/hgdaS7dWy_E/maxresdefault.jpg"><div class="game-title">Scrap Metal 3</div></div><div class="game-card" data-name="slope 2"><img src="https://www.yoosfuhl.com/wp-content/uploads/2024/11/Slope-2-game.jpg"><div class="game-title">Slope 2</div></div><div class="game-card" data-name="ovo"><img src="https://images.crazygames.com/games/ovo/cover-1605160387375.png?auto=format,compress&amp;q=75&amp;cs=strip"><div class="game-title">OvO</div></div><div class="game-card" data-name="super mx the champion"><img src="https://assets.funnygames.org/5/115075/100941/1200x630/super-mx-the-champion.webp"><div class="game-title">Super MX The Champion</div></div><div class="game-card" data-name="stickman hook"><img src="https://watchdocumentaries.com/wp-content/uploads/stickman-hook-game.jpg"><div class="game-title">Stickman Hook</div></div><div class="game-card" data-name="gobble"><img src="https://i.postimg.cc/YSgp2KCf/Screenshot-2025-02-08-195406.png"><div class="game-title">GOBBLE</div></div><div class="game-card" data-name="traffic rush!"><img src="https://play-lh.googleusercontent.com/2QkdTn3BN3d6xASeCwUqj6ceiyPv0kjr2Fc5ouLRiLBqRR5n-nm-04LXRdTQd-6hyt8=w1024-h500"><div class="game-title">Traffic Rush!</div></div><div class="game-card" data-name="snake is mlg edition"><img src="https://games.lol/wp-content/uploads/2021/03/snake-is-pc-full-version.jpg"><div class="game-title">Snake Is MLG Edition</div></div><div class="game-card" data-name="tunnel rush"><img src="https://i.ytimg.com/vi/AaaXNVdIFFU/hqdefault.jpg"><div class="game-title">Tunnel Rush</div></div><div class="game-card" data-name="red ball 4"><img src="https://static.playhop.com/images/7ee39_10152950_18b61/0019ca7bd/2a0000018bed3a75_1f571df/dbe4f03737d41782331d_ea5daa/orig"><div class="game-title">Red Ball 4</div></div><div class="game-card" data-name="fruit ninja"><img src="https://cdn.prod.website-files.com/5fa23905123118739c5e21e2/64dd8b9d1a903a3f764b814b_FNCThumbnail.png"><div class="game-title">Fruit Ninja</div></div><div class="game-card" data-name="tomb of the mask"><img src="https://m.media-amazon.com/images/I/61ljJZNJV0L.png"><div class="game-title">Tomb Of The Mask</div></div><div class="game-card" data-name="basketball stars"><img src="https://imgs.crazygames.com/games/basketball-stars-2019/cover-1583231506155.png?metadata=none&amp;quality=40&amp;width=1200&amp;height=630&amp;fit=crop"><div class="game-title">Basketball Stars</div></div><div class="game-card" data-name="game name"><img src="Game Image"><div class="game-title">Game Name</div></div><div class="game-card" data-name="game name"><img src="Game Image"><div class="game-title">Game Name</div></div><div class="game-card" data-name="game name"><img src="Game Image"><div class="game-title">Game Name</div></div><div class="game-card" data-name="game name"><img src="Game Image"><div class="game-title">Game Name</div></div><div class="game-card" data-name="game name"><img src="Game Image"><div class="game-title">Game Name</div></div><div class="game-card" data-name="game name"><img src="Game Image"><div class="game-title">Game Name</div></div></div>
-    <div class="fullscreen-container" id="fullscreen">
-        <iframe id="gameFrame"></iframe>
-        <img src="https://i.postimg.cc/8C6zmL4T/Screenshot-2025-02-08-101326-removebg-preview.png" class="back-button" onclick="closeGame()">
-    </div>
-    <script>
-        const games = [
-            { name: "Drive Mad 2", embed: "https://historyedu1308.github.io/g77/drive-mad", image: "https://i.postimg.cc/GmBdLRh5/images.jpg" },
-            { name: "Geometry Dash", embed: "https://geometrydashlitepc.io/game/geometry-dash-lite/", image: "https://i.postimg.cc/zB79w2Gh/capsule-616x353.jpg" },
-            { name: "Sketch Book", embed: "https://jblaha.art/sketchbook/0.4/", image: "https://canada1.discourse-cdn.com/flex035/uploads/threejs/original/2X/0/051ece83d5266f62ca4f9a80ce35578dfd60be5c.jpeg" },
-            { name: "Paper Io 2", embed: "https://historyedu1308.github.io/g9/paper-io-2", image: "https://i.ytimg.com/vi/tjnyIiCkp9Q/maxresdefault.jpg" },
-            { name: "Dadish", embed: "https://classroom6x.gitlab.io/dadish/", image: "https://i.postimg.cc/nr0pzcD6/Screenshot-2025-02-18-08-38-05.png" },
-            { name: "Elastic Man", embed: "https://classroom6x.gitlab.io/elastic-man/", image: "https://d21u3ic0kp9e91.cloudfront.net/meta/elastic-man.jpg" },
-            { name: "Crossy Road", embed: "https://classroom6x.gitlab.io/crossy-road/", image: "https://images.squarespace-cdn.com/content/v1/5cedd5e7c6e7df0001bbb67c/1564551973622-EE9YJORD9OFXPKW9NYKW/Banner_Video_Cover.jpg?format=1500w" },
-            { name: "Doge Miner", embed: "https://classroom6x.gitlab.io/doge-miner/", image: "https://i.postimg.cc/dtdR4rV0/Screenshot-2025-02-18-15-12-36.png" },
-            { name: "1v1.lol", embed: "https://classroom6x.gitlab.io/1v1-lol-offline/", image: "https://i.postimg.cc/1R05BzZQ/Screenshot-2025-02-18-15-16-26.png" },
-            { name: "Dadish 3D", embed: "https://classroom6x.gitlab.io/dadish-3d/", image: "https://i.postimg.cc/YSVfd3Yh/2x1-NSw-itch-DS-Dadish3-D-image1600w.jpg" },
-            { name: "Stickman Climb 2", embed: "https://classroom6x.gitlab.io/stickman-climb-2/", image: "https://i.postimg.cc/T1jVYvSD/Stickman-Climb-2.jpg" },
-            { name: "CATS", embed: "https://classroom6x.gitlab.io/cats/", image: "https://i.postimg.cc/FKf0kL8m/image.jpg" },
-            { name: "Duck Life", embed: "https://classroom6x.gitlab.io/duck-life/", image: "https://i.postimg.cc/xT8FyjQg/Screenshot-2025-02-08-182207.png" },
-            { name: "Duck Life 2", embed: "https://edu.bizis.si/a/hvtrs8%2F-ulbnoakgd%2Fgcmgs%2Cs1.cmczmncwq.aoo%2Feaoeq%2F0004-wkx-dwci-nide%2F2-ildgx%2Chvmn", image: "https://i.postimg.cc/Hk9qcm0m/Duck-Life2-OG-logo.jpg" },
-            { name: "Duck Life 3 Evolution", embed: "https://classroom6x.gitlab.io/duck-life-3-evolution/", image: "https://i.postimg.cc/nhnDYKmm/Duck-Life3-OG-logo.jpg" },
-            { name: "Duck Life 4", embed: "https://classroom6x.gitlab.io/duck-life-4/", image: "https://monkeymart.org/wp-content/uploads/2023/09/duck-life-4-banner.jpeg" },
-            { name: "Dyna Boy", embed: "https://classroom6x.gitlab.io/dyna-boy/", image: "https://i.postimg.cc/K8n7tC1J/Screenshot-2025-02-08-183204.png" },
-            { name: "Stickman Parkour 3", embed: "https://classroom6x.gitlab.io/stickman-parkour-3/", image: "https://i.postimg.cc/NfssddNQ/stickman-parkour-3.jpg" },
-            { name: "Dadish 3", embed: "https://monkeygg2.org/play/dadish-3/", image: "https://i.postimg.cc/CxnW7DVF/2x1-NSw-itch-DS-Dadish3-image1600w.jpg" },
-            { name: "OvO 2", embed: "https://monkeygg2.org/play/ovo/alpha/", image: "https://i.postimg.cc/KYRrBrXN/image.png" },
-            { name: "Subway Surfers New York", embed: "https://monkeygg2.org/play/subway-surfers-ny/", image: "https://i.ytimg.com/vi/4EDZ7wwY1gE/maxresdefault.jpg" },
-            { name: "Dadish 2", embed: "https://monkeygg2.org/play/dadish-2/", image: "https://i.postimg.cc/XqQpsmdy/H2x1-NSw-itch-DS-Dadish2.jpg" },
-            { name: "Super Mario Bros.", embed: "https://monkeygg2.org/play/mario-game", image: "https://townsquare.media/site/295/files/2020/09/super-mario-bros.jpg?w=780&q=75" },
-            { name: "Time Shooter 3 S.W.A.T", embed: "https://monkeygg2.org/play/time-shooter-3/", image: "https://i.postimg.cc/D0LKZXyf/time-shooter-3-sw-at-16x9-cover.avif" },
-            { name: "Stickman Archero Fight", embed: "https://historyedu1308.github.io/g69/stickman-archero-fight/", image: "https://i.postimg.cc/GpwGT0Qc/stickman-archero-fight.avif" },
-            { name: "Tiny Fishing", embed: "https://historyedu1308.github.io/g/tiny-fishing/", image: "https://cdn.content.play123.com/game-images/tiny-fishing_xl.jpg" },
-            { name: "Bitlife", embed: "https://historyedu1308.github.io/g/bitlife/", image: "https://i.imghippo.com/files/igMQ9734Cg.png" },
-            { name: "Superbrawl", embed: "https://historyedu1308.github.io/g177/superbrawl/", image: "https://i.postimg.cc/s2jH80B4/icn-heroimage.png" },
-            { name: "Slope", embed: "https://historyedu1308.github.io/g/slope/", image: "https://sloperun.org/data/image/posts/slope-image.jpg" },
-            { name: "Paint Strike", embed: "https://historyedu1308.github.io/g16/paint-strike/", image: "https://i.postimg.cc/1zd0HWDt/paint-strike-cover.png" },
-            { name: "Idle Ants", embed: "https://historyedu1308.github.io/g5/idle-ants/", image: "https://modzmania.com/wp-content/uploads/2024/03/Idle-Ants-Mod-menu.webp" },
-            { name: "Cookie Clicker", embed: "https://carter-is-black.glitch.me/", image: "https://i.postimg.cc/zfYb5kFM/Screenshot-2025-02-08-191941.png" },
-            { name: "Run 3 Editor", embed: "https://historyedu1308.github.io/g9/run-3-editor/", image: "https://i.postimg.cc/cHXS2n4r/loading.png" },
-            { name: "Run 3", embed: "https://lekug.github.io/tn6pS9dCf37xAhkJv/", image: "https://i.postimg.cc/RF083b4Z/Run3-OG-logo.jpg" },
-            { name: "Monster Tracks", embed: "https://historyedu1308.github.io/g5/monster-tracks/", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSYqofF0YGyQlZFIL9pKhac_XBz98DVtqs0CTQqVJ6yqHmIlSNVzvTTh0p6vp6dokXZ1qY&usqp=CAU" },
-            { name: "Jelly Truck", embed: "https://historyedu1308.github.io/g/jelly-truck/", image: "https://i.postimg.cc/R0P3QN5L/Jelly-Truck-OG-Logo.jpg" },
-            { name: "Burnout Drift: Seaport Max", embed: "https://historyedu1308.github.io/g2/burnout-drift-seaport-max/", image: "https://i.ytimg.com/vi/bainIBr7Cyg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCc6frQ4_dvThFt6X7eUnPkmY6sxA" },
-            { name: "Highway Traffic", embed: "https://historyedu1308.github.io/g7/highway-traffic/", image: "https://i.postimg.cc/DZphWPfg/image.png" },
-            { name: "Eggy Car", embed: "https://historyedu1308.github.io/g/eggy-car/", image: "https://i.postimg.cc/YSW-Nx1vr/Screenshot-2025-02-21-08-45-25.png" },
-            { name: "Rocket Soccer Derby", embed: "https://historyedu1308.github.io/g6/rocket-soccer-derby/", image: "https://m.media-amazon.com/images/I/B1P+CzRoNJL.png" },
-            { name: "Scrap Metal 3", embed: "https://historyedu1308.github.io/g8/scrap-metal/", image: "https://i.ytimg.com/vi/hgdaS7dWy_E/maxresdefault.jpg" },
-            { name: "Slope 2", embed: "https://historyedu1308.github.io/g9/two-ball-3d-dark/", image: "https://i.postimg.cc/xCGKwnGB/Slope-2-game.jpg" },
-            { name: "OvO", embed: "https://historyedu1308.github.io/g/ovo/", image: "https://i.postimg.cc/wTrsb187/Screenshot-2025-02-21-08-47-51.png" },
-            { name: "Super MX The Champion", embed: "https://historyedu1308.github.io/g26/super-mx-the-champion/", image: "https://i.postimg.cc/YqThzTYF/super-mx-the-champion.webp" },
-            { name: "Stickman Hook", embed: "https://historyedu1308.github.io/g/stickman-hook/", image: "https://i.postimg.cc/nzdLjWnC/stickman-hook-game.jpg" },
-            { name: "GOBBLE", embed: "https://historyedu1308.github.io/g4/gobble/", image: "https://i.postimg.cc/YSgp2KCf/Screenshot-2025-02-08-195406.png" },
-            { name: "Traffic Rush!", embed: "https://historyedu1308.github.io/g177/traffic-rush/", image: "https://play-lh.googleusercontent.com/2QkdTn3BN3d6xASeCwUqj6ceiyPv0kjr2Fc5ouLRiLBqRR5n-nm-04LXRdTQd-6hyt8=w1024-h500" },
-            { name: "Snake Is MLG Edition", embed: "https://historyedu1308.github.io/g177/snake-is-mlg-edition/", image: "https://i.postimg.cc/fWrLM1HP/snake-is-pc-full-version.jpg" },
-            { name: "Tunnel Rush", embed: "https://historyedu1308.github.io/g/tunnel-rush/", image: "https://i.ytimg.com/vi/AaaXNVdIFFU/hqdefault.jpg" },
-            { name: "Red Ball 4", embed: "https://historyedu1308.github.io/g177/red-ball-4/", image: "https://i.imghippo.com/files/BJSW1593aV.png" },
-            { name: "Fruit Ninja", embed: "https://historyedu1308.github.io/g69/fruit-ninja/", image: "https://cdn.prod.website-files.com/5fa23905123118739c5e21e2/64dd8b9d1a903a3f764b814b_FNCThumbnail.png" },
-            { name: "Tomb Of The Mask", embed: "https://historyedu1308.github.io/g8/tomb-of-the-mask/", image: "https://m.media-amazon.com/images/I/61ljJZNJV0L.png" },
-            { name: "Basketball Stars", embed: "https://historyedu1308.github.io/g/basketball-stars/", image: "https://i.postimg.cc/nLpVdxzX/Screenshot-2025-02-21-08-51-16.png" },
-            { name: "Flappy Bird", embed: "https://historyedu1308.github.io/g8/flappy-bird-origin/", image: "https://static1.srcdn.com/wordpress/wp-content/uploads/2024/09/reasons-to-not-play-flappy-bird-game.jpg" },
-            { name: "Snow Rider 3D", embed: "https://historyedu1308.github.io/g8/snow-rider-3d/", image: "https://i.postimg.cc/4d3fg1pZ/snow-rider-3d.webp" },
-            { name: "Monkey Mart", embed: "https://historyedu1308.github.io/g8/monkey-mart/", image: "https://i.postimg.cc/pT12XnBj/monkey-mart-game1.jpg" },
-            { name: "Drift Boss", embed: "https://historyedu1308.github.io/g/drift-boss/", image: "https://i.postimg.cc/VLtYmv0S/Screenshot-2025-02-21-08-53-18.png" },
-            { name: "Among Us", embed: "https://historyedu1308.github.io/g/among-us/", image: "https://i.postimg.cc/sg9sGLcs/capsule-616x353.jpg" },
-            { name: "Stick Defenders", embed: "https://historyedu1308.github.io/g6/stick-defenders/", image: "https://i.postimg.cc/5jWW65QX/image.png" },
-            { name: "Moto X3M", embed: "https://historyedu1308.github.io/g8/moto-x3m/", image: "https://i.postimg.cc/G2BpDQtK/Screenshot-2025-02-21-08-55-41.png" },
-            { name: "Gunspin", embed: "https://historyedu1308.github.io/g/gunspin/", image: "https://play-lh.googleusercontent.com/MUwWlyZkJJ-_WkLwS-TwQtlyN6mJ9xH-egF3D588XVAWtPzG8_0MxRsj25VKnHYw724=w526-h296-rw" },
-            { name: "Stick Merge", embed: "https://historyedu1308.github.io/g3/stick-merge/", image: "https://m.media-amazon.com/images/I/B1KfaS6KVFL.png" },
-            { name: "Vex 8", embed: "https://historyedu1308.github.io/g16/vex-8/", image: "https://i.postimg.cc/26rydGDN/Screenshot-2025-02-20-08-47-37.png" },
-            { name: "Fireboy And Watergirl 1", embed: "https://historyedu1308.github.io/g26/fireboy-and-watergirl-1-forest-temple", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmv05_7zb07KzN4gnuE__mPoJa5CPgzGiIUxwnzV656VeUIi0quXw-5H2AauD8Pj_35vk&usqp=CAU" },
-            ];
-        const gamesGrid = document.getElementById("gamesGrid");
-        function displayGames() {
-            gamesGrid.innerHTML = "";
-            games.forEach(game => {
-                let gameDiv = document.createElement("div");
-                gameDiv.classList.add("game-card");
-                gameDiv.setAttribute("data-name", game.name.toLowerCase());
-                gameDiv.onclick = () => openGame(game.embed);
-                gameDiv.innerHTML = `<img src="${game.image}"><div class='game-title'>${game.name}</div>`;
-                gamesGrid.appendChild(gameDiv);
-            });
-        }
-        displayGames();
-        
-        function filterGames() {
-            const searchValue = document.getElementById('search').value.toLowerCase();
-            const filteredGames = games.filter(game => game.name.toLowerCase().startsWith(searchValue));
-            gamesGrid.innerHTML = "";
-            filteredGames.forEach(game => {
-                let gameDiv = document.createElement("div");
-                gameDiv.classList.add("game-card");
-                gameDiv.setAttribute("data-name", game.name.toLowerCase());
-                gameDiv.onclick = () => openGame(game.embed);
-                gameDiv.innerHTML = `<img src="${game.image}"><div class='game-title'>${game.name}</div>`;
-                gamesGrid.appendChild(gameDiv);
-            });
-        }
-        
-        function openGame(url) {
-            document.getElementById('gameFrame').src = url;
-            document.getElementById('fullscreen').classList.add('show');
-        }
-        function closeGame() {
-            document.getElementById('fullscreen').classList.remove('show');
-            document.getElementById('gameFrame').src = '';
-        }
-    </script>
+<body>
 
-</body></html>
+<header>
+    <div class="header-left">
+        <!-- Image in the top left corner of the header -->
+        <img src="cwuik.png" alt="Logo"> <!--https://raw.githubusercontent.com/inftt/Cwuik-V2/refs/heads/main/cwuik.png-->
+    </div>
+    <div class="search-container">
+        <input type="text" id="search-bar" placeholder="Search for a game..." onkeyup="filterGames()">
+    </div>
+    <div class="switch-container">
+        <button onclick="toggleBackground()">Switch Background</button>
+        <select id="game-glow-color" onchange="updateGlowColor(event)">
+            <option value="blue">Blue Glow</option>
+            <option value="green">Green Glow</option>
+            <option value="pink">Pink Glow</option>
+        </select>
+    </div>
+</header>
+
+<div class="games-played" id="games-played">
+    <!-- Previously played games will appear here -->
+</div>
+
+<div class="main-page" id="game-library">
+    <!-- Game Thumbnails (25 games) -->
+    <div class="game-thumbnail" onclick="openFullscreen('geometry-dash-lite')" data-name="geometry-dash-lite">
+        <img src="geometry-dash-lite-thumbnail.jpg" alt="geometry-dash-lite">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game2')" data-name="Game 2">
+        <img src="game2-thumbnail.jpg" alt="Game 2">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game3')" data-name="Game 3">
+        <img src="game3-thumbnail.jpg" alt="Game 3">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game4')" data-name="Game 4">
+        <img src="game4-thumbnail.jpg" alt="Game 4">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game5')" data-name="Game 5">
+        <img src="game5-thumbnail.jpg" alt="Game 5">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game1')" data-name="Game 6">
+        <img src="game6-thumbnail.jpg" alt="Game 6">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game2')" data-name="Game 7">
+        <img src="game7-thumbnail.jpg" alt="Game 7">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game3')" data-name="Game 8">
+        <img src="game8-thumbnail.jpg" alt="Game 8">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game4')" data-name="Game 9">
+        <img src="game9-thumbnail.jpg" alt="Game 9">
+    </div>
+    <div class="game-thumbnail" onclick="openFullscreen('game5')" data-name="Game 10">
+        <img src="game10-thumbnail.jpg" alt="Game 10">
+    </div>
+    <!-- More game thumbnails here -->
+</div>
+
+<div class="fullscreen-game" id="fullscreen-game">
+    <div class="fullscreen-header">
+        <img class="logo" src="logo.png" alt="Logo">
+        <div>
+            <img class="back-btn" src="back-button-image.png" alt="Back" onclick="closeFullscreen()">
+            <img class="fullscreen-btn" src="fullscreen-button-image.png" alt="Fullscreen" onclick="toggleFullscreen()">
+        </div>
+    </div>
+    <iframe id="game-iframe" src="" frameborder="0" width="100%" height="100%"></iframe>
+</div>
+
+<script>
+    let darkMode = true;
+    let currentGlowColor = 'blue';
+    let playedGames = [];
+    let isFullscreen = false;
+
+    function toggleBackground() {
+        darkMode = !darkMode;
+        document.body.style.backgroundColor = darkMode ? '#121212' : '#ffffff';
+        document.body.style.color = darkMode ? 'white' : 'black';
+    }
+
+    function updateGlowColor(event) {
+        currentGlowColor = event.target.value;
+        document.documentElement.style.setProperty('--glow-color', currentGlowColor);
+        document.querySelectorAll('.game-thumbnail').forEach(game => {
+            game.classList.remove('active');
+        });
+    }
+
+    function openFullscreen(game) {
+        const fullscreenGame = document.getElementById('fullscreen-game');
+        const gameIframe = document.getElementById('game-iframe');
+        gameIframe.src = getGameEmbedLink(game);
+        fullscreenGame.style.display = 'flex';
+
+        // Request fullscreen
+        if (fullscreenGame.requestFullscreen) {
+            fullscreenGame.requestFullscreen();
+        } else if (fullscreenGame.mozRequestFullScreen) { // Firefox
+            fullscreenGame.mozRequestFullScreen();
+        } else if (fullscreenGame.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            fullscreenGame.webkitRequestFullscreen();
+        } else if (fullscreenGame.msRequestFullscreen) { // IE/Edge
+            fullscreenGame.msRequestFullscreen();
+        }
+
+        updatePlayedGames(game);
+        document.querySelectorAll('.game-thumbnail').forEach(thumbnail => {
+            thumbnail.classList.remove('active');
+        });
+        document.querySelector(`[data-name="${game}"]`).classList.add('active');
+    }
+
+    function closeFullscreen() {
+        const fullscreenGame = document.getElementById('fullscreen-game');
+        fullscreenGame.style.display = 'none';
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+            document.msExitFullscreen();
+        }
+    }
+
+    function toggleFullscreen() {
+        if (!isFullscreen) {
+            document.getElementById('fullscreen-game').requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+        isFullscreen = !isFullscreen;
+    }
+
+    function getGameEmbedLink(game) {
+        const gameLinks = {
+            'game1': 'https://geometrydashlitepc.io/game/geometry-dash-lite/',
+            'game2': 'https://lekug.github.io/tn6pS9dCf37xAhkJv/run-3',
+            'game3': 'https://www.example.com/embed/game3',
+            'game4': 'https://www.example.com/embed/game4',
+            'game5': 'https://www.example.com/embed/game5',
+            'game6': 'https://www.example.com/embed/game6',
+            'game7': 'https://www.example.com/embed/game7',
+            'game8': 'https://www.example.com/embed/game8',
+            'game9': 'https://www.example.com/embed/game9',
+            'game10':'https://www.example.com/embed/game10',
+        };
+        return gameLinks[game] || '';
+    }
+
+    function updatePlayedGames(game) {
+        if (!playedGames.includes(game)) {
+            playedGames.push(game);
+            const gameElement = document.createElement('img');
+            gameElement.src = `${game}-thumbnail.jpg`; // Modify according to your actual images
+            gameElement.alt = game;
+            gameElement.title = game;
+            gameElement.onclick = () => openFullscreen(game);
+            document.getElementById('games-played').appendChild(gameElement);
+        }
+    }
+
+    function filterGames() {
+        const query = document.getElementById('search-bar').value.toLowerCase();
+        const games = document.querySelectorAll('.game-thumbnail');
+        games.forEach(game => {
+            const gameName = game.dataset.name.toLowerCase();
+            game.style.display = gameName.includes(query) ? 'block' : 'none';
+        });
+    }
+</script>
+
+</body>
+</html>
